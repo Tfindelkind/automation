@@ -231,7 +231,7 @@ func main() {
 	//check if VM exists
 	exist, _ := ntnxAPI.VMExist(&n, v.Config.Name)
 
-	if exist {
+	if ( exist ) {
 		log.Warn("VM " + v.Config.Name + " already exists")
 	} else {
 
