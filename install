@@ -1,0 +1,4 @@
+cd deploy_cloud_vm 
+go build *.go
+go install 
+cd ..
