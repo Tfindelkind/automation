@@ -190,13 +190,13 @@ func main() {
 	}*/
 	
 	
-	clusters, err := f.ClusterComputeResourceList(ctx, "*")
+	/*clusters, err := f.ClusterComputeResourceList(ctx, "*")
 			
 	
 		for _, cluster := range clusters {
 				
 			fmt.Println(&cmd.ClusterConfigSpecEx)
-		}
+		}*/
 	
 
 	

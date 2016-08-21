@@ -1,0 +1,1 @@
+go build ./deploy_cloud_vm_src/*.go
