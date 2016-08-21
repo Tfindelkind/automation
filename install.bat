@@ -1,5 +1,5 @@
 cd deploy_cloud_vm 
-get get
-go build *.go
+go get 
+go build
 go install 
 cd ..

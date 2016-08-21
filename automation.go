@@ -16,7 +16,7 @@ func main(){
 	
 	switch os := runtime.GOOS; os {
 	case "windows":
-		exec.Command("cmd", "/C", "install")
+		exec.Command("cmd", "/C", "install.bat")
     case "linux":
     	{ 
 		 out, err := exec.Command("/bin/bash","install").Output()
