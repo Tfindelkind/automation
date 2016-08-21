@@ -1,3 +1,25 @@
+/* Copyright (c) 2016 Thomas Findelkind
+#
+# This program is free software: you can redistribute it and/or modify it under
+# the terms of the GNU General Public License as published by the Free Software
+# Foundation, either version 3 of the License, or (at your option) any later
+# version.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU General Public License along with
+# this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+# MORE ABOUT THIS SCRIPT AVAILABLE IN THE README AND AT:
+#
+# http://tfindelkind.com
+#
+# ---------------------------------------------------------------------------- 
+*/
+
 package main
 
 import (
@@ -22,8 +44,7 @@ var (
 	image_file      *string
 	seed_file       *string
 	vlan            *string
-	image_container *string
-	vm_container    *string
+	container       *string
 	debug           *bool
 	help            *bool
 	version         *bool
@@ -39,8 +60,7 @@ func init() {
 	image_file = flag.String("image-file", "CentOS-7-x86_64-GenericCloud-1606.qcow2", "a string")
 	seed_file = flag.String("seed-file", "seed.iso", "a string")
 	vlan = flag.String("vlan", "VLAN0", "a string")
-	image_container = flag.String("image-container", "ISO", "a string")
-	vm_container = flag.String("vm-container", "prod", "a string")
+	container = flag.String("container", "ISO", "a string")	
 	debug = flag.Bool("debug", false, "a bool")
 	help = flag.Bool("help", false, "a bool")
 	version = flag.Bool("version", false, "a bool")
@@ -65,8 +85,7 @@ func printHelp() {
 	fmt.Println("--seed-name        Specify the name of the Seed.ISO in Image Service")
 	fmt.Println("--seed-file        Speficy the file name of the Seed.ISO")
 	fmt.Println("--vlan             Specify the VLAN to which the VM will be connected")
-	fmt.Println("--image_container  Specify the container where images will be stored")
-	fmt.Println("--vm_container     Specify the container where the VM will be stored")
+	fmt.Println("--container        Specify the container where images/vm will be stored")
 	fmt.Println("--debug            Enables debug mode")
 	fmt.Println("--help             List this help")
 	fmt.Println("--version          Show the deploy_cloud_vm version")
@@ -141,8 +160,8 @@ func main() {
 	*/
 
 	/*To-DO:
-	  1. commandline help
-	  2. Inplement progress bar- (concurreny and get progress from task)
+	
+	  1. Inplement progress bar while uploading- (concurreny and get progress from task)
 
 
 	*/
@@ -150,8 +169,7 @@ func main() {
 	// upload cloud image to image service
 	if ntnxAPI.ImageExistbyName(&n, &im) {
 		log.Warn("Image " + im.Name + " already exists")
-		// get existing image ID
-		im.UUID, _ = ntnxAPI.GetImageIDbyName(&n, im.Name)
+		// get existing image ID		
 	} else {
 		taskUUID, _ = ntnxAPI.CreateImageObject(&n, &im)
 
@@ -160,20 +178,19 @@ func main() {
 			log.Fatal("Task does not exist")
 		}
 
-		im.UUID = ntnxAPI.GetImageIDbyTask(&n, &task)
+		im.UUID = ntnxAPI.GetImageUUIDbyTask(&n, &task)
 
-		_, statusCode := ntnxAPI.PutFileToImage(&n, ntnxAPI.NutanixAHVurl(&n), "images/"+im.UUID+"/upload", *image_file, *image_container)
+		_, statusCode := ntnxAPI.PutFileToImage(&n, ntnxAPI.NutanixAHVurl(&n), "images/"+im.UUID+"/upload", *image_file, *container)
 
 		if statusCode != 200 {
 			log.Error("Image upload failed")
 			os.Exit(1)
-		}
+		}					
 	}
 
 	// upload seed.iso to image service
 	if ntnxAPI.ImageExistbyName(&n, &seed) {
 		log.Warn("Image " + seed.Name + " already exists")
-		seed.UUID, _ = ntnxAPI.GetImageIDbyName(&n, seed.Name)
 	} else {
 		taskUUID, _ = ntnxAPI.CreateImageObject(&n, &seed)
 
@@ -182,15 +199,34 @@ func main() {
 			log.Fatal("Task does not exist")
 		}
 
-		seed.UUID = ntnxAPI.GetImageIDbyTask(&n, &task)
+		seed.UUID = ntnxAPI.GetImageUUIDbyTask(&n, &task)
 
-		_, statusCode := ntnxAPI.PutFileToImage(&n, ntnxAPI.NutanixAHVurl(&n), "images/"+seed.UUID+"/upload", *seed_file, *image_container)
+		_, statusCode := ntnxAPI.PutFileToImage(&n, ntnxAPI.NutanixAHVurl(&n), "images/"+seed.UUID+"/upload", *seed_file, *container)
 
 		if statusCode != 200 {
 			log.Error("Image upload failed")
 			os.Exit(1)
 		}
 	}
+	
+	// make sure cloud image is active and get all infos when active
+	log.Info("Wait that the cloud image is activated...")
+	ImageActive, _ := ntnxAPI.WaitUntilImageIsActive(&n,&im)
+	if ( !ImageActive ) {
+		log.Fatal("Cloud Image is not active")
+		os.Exit(1)
+	}
+	im , _ = ntnxAPI.GetImagebyName(&n, im.Name)
+	
+	// make sure seed image is active and get all infos when active	
+	log.Info("Wait that the seed image is activated...")
+	ImageActive, _ = ntnxAPI.WaitUntilImageIsActive(&n,&seed)
+	
+	if ( !ImageActive ) {
+		log.Fatal("Seed Image is not active")
+		os.Exit(1)
+	}
+	seed, _ = ntnxAPI.GetImagebyName(&n, seed.Name)
 
 	//check if VM exists
 	exist, _ := ntnxAPI.VMExist(&n, v.Config.Name)
