@@ -124,7 +124,7 @@ func main() {
 
 	var n ntnxAPI.NTNXConnection
 	var v ntnxAPI.VM_json_AHV
-	var nic1 ntnxAPI.Network_REST
+	var net ntnxAPI.Network_REST
 	var im ntnxAPI.Image_json_AHV
 	var seed ntnxAPI.Image_json_AHV
 	var taskUUID ntnxAPI.TaskUUID
@@ -268,9 +268,9 @@ func main() {
 		}
 
 		//	Create Nic1
-		nic1.UUID = ntnxAPI.GetNetworkIDbyName(&n, "VLAN0")
+		net.UUID = ntnxAPI.GetNetworkIDbyName(&n, "VLAN0")
 
-		taskUUID, _ = ntnxAPI.CreateVNicforVM(&n, &v, &nic1)
+		taskUUID, _ = ntnxAPI.CreateVNicforVM(&n, &v, &net)
 
 		task, err = ntnxAPI.WaitUntilTaskFinished(&n, taskUUID.TaskUUID)
 		if err != nil {
