@@ -26,7 +26,7 @@ package main
 import ( 
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/Tfindelkind/ntnx-golang-client-sdk"
+	ntnxAPI "github.com/Tfindelkind/ntnx-golang-client-sdk"
 	
 	"fmt"
 	"flag"
