@@ -1,37 +1,18 @@
 package main
 
+/*
 import (
 	"flag"
 	"fmt"
 	"net/url"
 	"os"
-	"strings"
-	// "log"
-	//"archive/tar"
-	//"strconv"
-	//"errors"
-	"os/exec"
-	//"net"
-	//"net/http"
-	//"io/ioutil"
-	//"io"
-	//"time"
-	//"path"
-	
-	// rename because duplicated package name
-	//gssh "golang.org/x/crypto/ssh"
-	
-	//"github.com/Tfindelkind/ntnx-golang-client-sdk"
+	"strings"	
+	"os/exec"		
 	
 	"github.com/vmware/govmomi"
-	"github.com/vmware/govmomi/find"
-	//github.com/vmware/govmomi/property"
-	//"github.com/vmware/govmomi/list"
-	//"github.com/vmware/govmomi/vim25"
-	//"github.com/vmware/govmomi/vim25/mo"
-	"github.com/vmware/govmomi/vim25/types"
-	//"github.com/vmware/govmomi/object"
-	"golang.org/x/net/context"
+	"github.com/vmware/govmomi/find"	
+	"github.com/vmware/govmomi/vim25/types"	
+	//"golang.org/x/net/context"
 	"github.com/vmware/govmomi/govc/flags"
 )
 
@@ -149,8 +130,8 @@ type change struct {
 }
 
 func main() {
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
+	//ctx, cancel := context.WithCancel(context.Background())
+	//	defer cancel()
 
 	flag.Parse()
 
@@ -164,7 +145,7 @@ func main() {
 	processOverride(u)
 
 	// Connect and log in to ESX or vCenter
-	c, err := govmomi.NewClient(ctx, u, *insecureFlag)
+	//c, err := govmomi.NewClient(ctx, u, *insecureFlag)
 	if err != nil {
 		exit(err)
 	}
@@ -172,7 +153,7 @@ func main() {
 	f := find.NewFinder(c.Client, true)
 	
 		// Find one and only datacenter
-	dc, err := f.DefaultDatacenter(ctx)
+	//	dc, err := f.DefaultDatacenter(ctx)
 	if err != nil {
 		exit(err)
 	}
@@ -220,9 +201,10 @@ func main() {
 	output, err := cmd.CombinedOutput()
 	printError(err)
 	printOutput(output) // => go version go1.3 darwin/amd64*/
+
+
+func main() {
 }
-
-
 
 
 
