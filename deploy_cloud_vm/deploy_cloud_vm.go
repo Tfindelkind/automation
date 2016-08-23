@@ -289,6 +289,8 @@ func main() {
 		} else {
 			log.Info("VM started")
 		}
+		
+	  log.Info("Remember that it takes a while untill all tools are installed. Check /var/log/cloud-init-output.log	for messages: 'The VM is finally up, after .. seconds'")
 
 	}
 }
