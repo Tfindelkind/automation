@@ -257,6 +257,8 @@ func evaluateFlags() (ntnxAPI.NTNXConnection,ntnxAPI.VM_json_AHV,ntnxAPI.VM_json
 	ntnxAPI.EncodeCredentials(&n)
 	ntnxAPI.CreateHttpClient(&n)
 	
+	ntnxAPI.NutanixCheckCredentials(&n)
+	
 	// list mapping if specified
 	if (*list_mapping) {
 		var list_mapping_str string

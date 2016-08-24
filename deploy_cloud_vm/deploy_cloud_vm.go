@@ -51,16 +51,16 @@ var (
 )
 
 func init() {
-	host = flag.String("host", "192.168.178.130", "a string")
-	username = flag.String("username", "admin", "a string")
-	password = flag.String("password", "nutanix/4u", "a string")
-	vm_name = flag.String("vm-name", "NTNX-AVM", "a string")
-	image_name = flag.String("image-name", "Centos7-1606", "a string")
-	seed_name = flag.String("seed-name", "CloudInitSeed", "a string")
-	image_file = flag.String("image-file", "CentOS-7-x86_64-GenericCloud-1606.qcow2", "a string")
-	seed_file = flag.String("seed-file", "seed.iso", "a string")
-	vlan = flag.String("vlan", "VLAN0", "a string")
-	container = flag.String("container", "ISO", "a string")	
+	host = flag.String("host", "", "a string")
+	username = flag.String("username", "", "a string")
+	password = flag.String("password", "", "a string")
+	vm_name = flag.String("vm-name", "", "a string")
+	image_name = flag.String("image-name", "", "a string")
+	seed_name = flag.String("seed-name", "", "a string")
+	image_file = flag.String("image-file", "", "a string")
+	seed_file = flag.String("seed-file", "", "a string")
+	vlan = flag.String("vlan", "", "a string")
+	container = flag.String("container", "", "a string")	
 	debug = flag.Bool("debug", false, "a bool")
 	help = flag.Bool("help", false, "a bool")
 	version = flag.Bool("version", false, "a bool")
@@ -96,27 +96,110 @@ func printHelp() {
 	fmt.Println("")
 }
 
+
+func evaluateFlags() (ntnxAPI.NTNXConnection,ntnxAPI.VM_json_AHV) {
+	
+	//help
+	if *help {
+		printHelp()
+		os.Exit(0)
+	}
+	
+    //version
+	if *version {
+		fmt.Println("Version: " + AppVersion)
+		os.Exit(0)
+	}
+
+	//debug
+	if *debug {
+		log.SetLevel(log.DebugLevel)
+	} else {
+		log.SetLevel(log.InfoLevel)
+	}
+				
+	//host
+	if ( *host == "" ) {
+		log.Warn("mandatory option 'host' is not set")	
+		os.Exit(0)
+	}
+	
+	//username
+	if ( *username == "" ) {
+		log.Warn("mandatory option 'username' is not set")	
+		os.Exit(0)
+	}
+	
+	//password
+	if ( *password == "" ) {
+		log.Warn("mandatory option 'password' is not set")	
+		os.Exit(0)
+	}
+	
+	//vm-name	
+	if ( *vm_name == "" ) {
+		log.Warn("mandatory option 'vm-name' is not set")	
+		os.Exit(0)
+	}
+	var v 		 		ntnxAPI.VM_json_AHV	
+	v.Config.Name = *vm_name
+	
+	var n 		 		ntnxAPI.NTNXConnection
+	
+	n.NutanixHost = *host
+	n.Username = *username
+	n.Password = *password
+	
+	ntnxAPI.EncodeCredentials(&n)
+	ntnxAPI.CreateHttpClient(&n)
+
+	ntnxAPI.NutanixCheckCredentials(&n)
+	
+	//image-name
+	if ( *image_name == "" ) {
+		log.Warn("mandatory option 'image-name' is not set")	
+		os.Exit(0)
+	}
+	
+	//image-file
+	if ( *image_file == "" ) {
+		log.Warn("mandatory option 'image-file' is not set")	
+		os.Exit(0)
+	}
+	
+	//seed-name
+	if ( *seed_name == "" ) {
+		log.Warn("mandatory option 'seed-name' is not set")	
+		os.Exit(0)
+	}
+	
+	//seed-file
+	if ( *seed_file == "" ) {
+		log.Warn("mandatory option 'seed-file' is not set")	
+		os.Exit(0)
+	}		
+								
+	// If container is not found exit
+	if ( *container != "") {
+		_ , err := ntnxAPI.GetContainerUUIDbyName(&n,*container)
+		if ( err != nil) {
+			os.Exit(1)
+		}
+		
+	} else {
+		log.Warn("mandatory option 'container' is not set")	
+		os.Exit(0)			
+	} 
+	
+	return n,v
+}
+
 func main() {
 
 	flag.Usage = printHelp
 	flag.Parse()
 		
 
-	if *help {
-		printHelp()
-		os.Exit(0)
-	}
-
-	if *version {
-		fmt.Println("Version: " + AppVersion)
-		os.Exit(0)
-	}
-
-	if *debug {
-		log.SetLevel(log.DebugLevel)
-	} else {
-		log.SetLevel(log.InfoLevel)
-	}
 	customFormatter := new(log.TextFormatter)
 	customFormatter.TimestampFormat = "2006-01-02 15:04:05"
 	log.SetFormatter(customFormatter)
@@ -128,24 +211,21 @@ func main() {
 	var im ntnxAPI.Image_json_AHV
 	var seed ntnxAPI.Image_json_AHV
 	var taskUUID ntnxAPI.TaskUUID
-
-	n.NutanixHost = *host
-	n.Username = *username
-	n.Password = *password
+	
+	n, v = evaluateFlags()
+	
 	im.Name = *image_name
 	im.Annotation = "deployed with deploy_cloud_vm"
 	im.ImageType = "DISK_IMAGE"
 	seed.Name = *seed_name
 	seed.Annotation = "deployed with deploy_cloud_vm"
 	seed.ImageType = "ISO_IMAGE"
-	v.Config.Name = *vm_name
 	v.Config.Description = "deployed with deploy_cloud_vm"
 	v.Config.MemoryMb = 4096
 	v.Config.NumVcpus = 1
 	v.Config.NumCoresPerVcpu = 1
-
-	ntnxAPI.EncodeCredentials(&n)
-	ntnxAPI.CreateHttpClient(&n)
+	
+	
 
 	/*
 	   Short description what will be done
