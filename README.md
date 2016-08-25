@@ -4,7 +4,7 @@ The automation project is a central source for all scripts related to Nutanix.
 
 See http://tfindelkind.com for all details and step-by-step guides
 
-# Dependecies
+# Dependencies
 I recommend to install the Nutanix automation VM (AVM) for an easy use. 
 Found at https://github.com/Tfindelkind/DCI
 
