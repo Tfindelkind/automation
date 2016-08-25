@@ -1,6 +1,6 @@
 # automation
 
-The automation project is a central source for all scripts related to Nutanix
+The automation project is a central source for all scripts related to Nutanix.
 http://tfindelkind.com for all details and step-by-step guides
 
 # Dependecies
