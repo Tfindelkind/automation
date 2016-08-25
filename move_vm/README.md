@@ -1,6 +1,6 @@
 # move_vm
 
-mv_vm - golang binary which leverages the Nutanix REST API to move a VM from one container to another one (AKA SVMOTION)
+move_vm - golang binary which leverages the Nutanix REST API to move a VM from one container to another one (AKA SVMOTION)
 
 !!! Nutanix AHV ONLY - SOURCE VM MUST BE STOPPED-> no online motion !!! 
 
