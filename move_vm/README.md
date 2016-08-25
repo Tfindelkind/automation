@@ -11,7 +11,7 @@ In the first release I am using the unofficial ntnxAPI SDK but in future release
 
 See http://tfindelkind.com for all details and step-by-step guides
 
-# Dependecies
+# Dependencies
 I recommend to install the Nutanix automation VM (AVM) for an easy use. 
 Found at https://github.com/Tfindelkind/DCI
 
