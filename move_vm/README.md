@@ -13,7 +13,7 @@ In the first release I am using the unofficial ntnxAPI SDK but in future release
 
 I recommend to install the Automation VM for an easy use. 
 
-go get https://github.com/Tfindelkind/move_vm
+go get https://github.com/Tfindelkind/automation/move_vm
 
 # Usage
 
