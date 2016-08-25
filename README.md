@@ -1,20 +1,29 @@
-# move_vm
+# automation
 
-move_vm is an easy script 
-In the first release I am using the unofficial ntnxAPI SDK but in future release I will change to the official Nutanix Golang SDK.
+The automation project is a central source for all scripts related to Nutanix
+http://tfindelkind.com for all details and step-by-step guides
 
-mv_vm - golang scripts which leverages the Nutanix REST API to move a VM from one container to another one (AKA SVMOTION)
+# Dependecies
+I recommend to install the Nutanix automation VM (AVM) for an easy use. 
+Found at https://github.com/Tfindelkind/DCI
 
-It makes use of recipes which are defined before used. The recipes are simple text files right now because they are easy to use and enable me to reduce the over in the beginning. This may change in the future.
+or install golang from https://golang.org/ 
+Don't forget to set "GOPATH"
 
-Installing
+# Installing
 
-I recommend to install the Automation VM for an easy use. 
+go get https://github.com/Tfindelkind/automation/...
 
-go get https://github.com/Tfindelkind/ntnx-golang-client-sdk 
-go get https://github.com/Tfindelkind/move_vm
+Don't miss the three dots "..." at the end!
 
-Usage.
+# Usage
 
-move_vm VMname Destination_Container
+All binaries should be available at GOPATH\bin
+Check the subfolder README.md for more details like:
+
+https://github.com/Tfindelkind/automation/move_vm
+
+
+
+
 
