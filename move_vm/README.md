@@ -1,6 +1,8 @@
 # move_vm
 
-mv_vm - golang scripts which leverages the Nutanix REST API to move a VM from one container to another one (AKA SVMOTION)
+mv_vm - golang binary which leverages the Nutanix REST API to move a VM from one container to another one (AKA SVMOTION)
+
+!!! Nutanix AHV ONLY - SOURCE VM MUST BE STOPPED-> no online motion !!! 
 
 This is related to the fact that Nutanix don't provide a gui for that and the KB 000002663 is not that easy to implement for more than one VM
 
