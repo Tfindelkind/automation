@@ -9,9 +9,16 @@ The Nutanix KB 000002663 shows the manual tasks which are involved to copy a vm 
 
 In the first release I am using the unofficial ntnxAPI SDK but in future release I will change to the official Nutanix Golang SDK.
 
-# Installing
+See http://tfindelkind.com for all details and step-by-step guides
 
-I recommend to install the Automation VM for an easy use. 
+# Dependecies
+I recommend to install the Nutanix automation VM (AVM) for an easy use. 
+Found at https://github.com/Tfindelkind/DCI
+
+or install golang from https://golang.org/ 
+Don't forget to set "GOPATH"
+
+# Installing
 
 go get https://github.com/Tfindelkind/automation/move_vm
 
