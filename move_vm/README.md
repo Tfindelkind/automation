@@ -24,6 +24,8 @@ Don't forget to set "GOPATH"
 
 go get https://github.com/Tfindelkind/automation/move_vm
 
+The binary will be in "GOPATH\bin"
+
 # Usage
 
 move_vm --host=NTNX-CVM --username=admin --password=nutanix/4u --vm-name=MyVM --image-container=prod
