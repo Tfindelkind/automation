@@ -19,7 +19,7 @@ Found at https://github.com/Tfindelkind/DCI
 
 or
 
-Install golang from https://golang.org/ if you don't use AVM or binary
+Install golang from https://golang.org/ if you don't use AVM or a binary.
 Don't forget to set "GOPATH"
 
 # Installing
