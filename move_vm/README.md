@@ -17,6 +17,8 @@ Make sure to NFS whitelist the host/VM where you run move_vm
 I recommend to install the Nutanix automation VM (AVM) for an easy use. 
 Found at https://github.com/Tfindelkind/DCI
 
+or download the binary from https://github.com/Tfindelkind/automation/releases
+
 or install golang from https://golang.org/ 
 Don't forget to set "GOPATH"
 
