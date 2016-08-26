@@ -12,18 +12,20 @@ In the first release I am using the unofficial ntnxAPI SDK but in future release
 See http://tfindelkind.com for all details and step-by-step guides
 
 # Dependencies
-Make sure to NFS whitelist the host/VM where you run move_vm
+# Make sure to NFS whitelist the host/VM where you run move_vm
 
 I recommend to install the Nutanix automation VM (AVM) for an easy use. 
 Found at https://github.com/Tfindelkind/DCI
 
-or download the binary from https://github.com/Tfindelkind/automation/releases
+or
 
-or install golang from https://golang.org/ 
+Install golang from https://golang.org/ if you don't use AVM or binary
 Don't forget to set "GOPATH"
 
 # Installing
 
+download the binary from https://github.com/Tfindelkind/automation/releases
+or
 go get https://github.com/Tfindelkind/automation/move_vm
 
 The binary will be in "GOPATH\bin"
