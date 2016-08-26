@@ -12,6 +12,8 @@ In the first release I am using the unofficial ntnxAPI SDK but in future release
 See http://tfindelkind.com for all details and step-by-step guides
 
 # Dependencies
+Make sure to NFS whitelist the VM where you run move_vm
+
 I recommend to install the Nutanix automation VM (AVM) for an easy use. 
 Found at https://github.com/Tfindelkind/DCI
 
