@@ -1,9 +1,12 @@
 package main
 
-// just a placeholder to avoid errors when auto build/install 
+import "fmt"
 
-func main(){    
-	
-	
+// just a placeholder to avoid errors when auto build/install
+
+func main() {
+
+	fmt.Println("hello du as")
+	fmt.Println("ge")
+
 }
-
