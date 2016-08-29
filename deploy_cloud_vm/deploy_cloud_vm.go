@@ -122,25 +122,25 @@ func evaluateFlags() (ntnxAPI.NTNXConnection, ntnxAPI.VMJSONAHV) {
 
 	//host
 	if *host == "" {
-		log.Warn("mandatory option 'host' is not set")
+		log.Warn("mandatory option '--host=' is not set")
 		os.Exit(0)
 	}
 
 	//username
 	if *username == "" {
-		log.Warn("mandatory option 'username' is not set")
+		log.Warn("mandatory option '--username=' is not set")
 		os.Exit(0)
 	}
 
 	//password
 	if *password == "" {
-		log.Warn("mandatory option 'password' is not set")
+		log.Warn("mandatory option '--password=' is not set")
 		os.Exit(0)
 	}
 
 	//vm-name
 	if *vmName == "" {
-		log.Warn("mandatory option 'vm-name' is not set")
+		log.Warn("mandatory option '--vm-name=' is not set")
 		os.Exit(0)
 	}
 	var v ntnxAPI.VMJSONAHV
@@ -159,25 +159,25 @@ func evaluateFlags() (ntnxAPI.NTNXConnection, ntnxAPI.VMJSONAHV) {
 
 	//image-name
 	if *imageName == "" {
-		log.Warn("mandatory option 'image-name' is not set")
+		log.Warn("mandatory option '--image-name=' is not set")
 		os.Exit(0)
 	}
 
 	//image-file
 	if *imageFile == "" {
-		log.Warn("mandatory option 'image-file' is not set")
+		log.Warn("mandatory option '--image-file=' is not set")
 		os.Exit(0)
 	}
 
 	//seed-name
 	if *seedName == "" {
-		log.Warn("mandatory option 'seed-name' is not set")
+		log.Warn("mandatory option '--seed-name=' is not set")
 		os.Exit(0)
 	}
 
 	//seed-file
 	if *seedFile == "" {
-		log.Warn("mandatory option 'seed-file' is not set")
+		log.Warn("mandatory option '--seed-file=' is not set")
 		os.Exit(0)
 	}
 
@@ -189,7 +189,7 @@ func evaluateFlags() (ntnxAPI.NTNXConnection, ntnxAPI.VMJSONAHV) {
 		}
 
 	} else {
-		log.Warn("mandatory option 'container' is not set")
+		log.Warn("mandatory option '--container=' is not set")
 		os.Exit(0)
 	}
 
@@ -222,7 +222,7 @@ func main() {
 	seed.Annotation = imageDesc
 	seed.ImageType = "ISO_IMAGE"
 	v.Config.Description = imageDesc
-	v.Config.MemoryMb = 4096
+	v.Config.MemoryMb = 2048
 	v.Config.NumVcpus = 1
 	v.Config.NumCoresPerVcpu = 1
 

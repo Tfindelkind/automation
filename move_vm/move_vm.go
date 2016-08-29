@@ -54,10 +54,10 @@ var (
 )
 
 func init() {
-	host = flag.String("host", "192.168.178.130", "a string")
-	username = flag.String("username", "admin", "a string")
-	password = flag.String("password", "nutanix/4u", "a string")
-	vmName = flag.String("vm-name", "MyVM", "a string")
+	host = flag.String("host", "", "a string")
+	username = flag.String("username", "", "a string")
+	password = flag.String("password", "", "a string")
+	vmName = flag.String("vm-name", "", "a string")
 	newVMName = flag.String("new-vm-name", "", "a string")
 	vdiskMapping = flag.String("vdisk-mapping", "", "a string")
 	container = flag.String("container", "", "a string")
@@ -212,25 +212,25 @@ func evaluateFlags() (ntnxAPI.NTNXConnection, ntnxAPI.VMJSONAHV, ntnxAPI.VMJSONA
 
 	//host
 	if *host == "" {
-		log.Warn("mandatory option 'host' is not set")
+		log.Warn("mandatory option '--host=' is not set")
 		os.Exit(0)
 	}
 
 	//username
 	if *username == "" {
-		log.Warn("mandatory option 'username' is not set")
+		log.Warn("mandatory option '--username=' is not set")
 		os.Exit(0)
 	}
 
 	//password
 	if *password == "" {
-		log.Warn("mandatory option 'password' is not set")
+		log.Warn("mandatory option '--password=' is not set")
 		os.Exit(0)
 	}
 
 	//vm-name
 	if *vmName == "" {
-		log.Warn("mandatory option 'vm-name' is not set")
+		log.Warn("mandatory option '--vm-name=' is not set")
 		os.Exit(0)
 	}
 	var vm ntnxAPI.VMJSONAHV
@@ -349,7 +349,6 @@ func main() {
 
 	/*To-DO:
 
-	  1. Check if Images exist already!
 	  2. show_progress
 
 
