@@ -25,7 +25,9 @@ Don't forget to set "GOPATH"
 # Installing
 
 Download the binary from https://github.com/Tfindelkind/automation/releases
+
 or
+
 go get https://github.com/Tfindelkind/automation/move_vm
 
 The binary will be in "GOPATH\bin"
