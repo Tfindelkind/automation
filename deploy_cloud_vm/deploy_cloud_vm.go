@@ -193,6 +193,12 @@ func evaluateFlags() (ntnxAPI.NTNXConnection, ntnxAPI.VMJSONAHV) {
 		os.Exit(0)
 	}
 
+	//seed-file
+	if *vlan == "" {
+		log.Warn("mandatory option '--vlan=' is not set")
+		os.Exit(0)
+	}
+
 	return n, v
 }
 
@@ -347,7 +353,7 @@ func main() {
 		}
 
 		//	Create Nic1
-		net.UUID = ntnxAPI.GetNetworkIDbyName(&n, "VLAN0")
+		net.UUID = ntnxAPI.GetNetworkIDbyName(&n, *vlan)
 
 		taskUUID, _ = ntnxAPI.CreateVNicforVM(&n, &v, &net)
 
