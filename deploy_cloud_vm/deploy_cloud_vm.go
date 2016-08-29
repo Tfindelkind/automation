@@ -17,7 +17,7 @@
 #
 # http://tfindelkind.com
 #
-# ---------------------------------------------------------------------------- 
+# ----------------------------------------------------------------------------
 */
 
 package main
@@ -32,35 +32,38 @@ import (
 	"flag"
 )
 
-const AppVersion = "0.9 beta"
+const (
+	appVersion = "0.9 beta"
+	imageDesc  = "deployed with deploy_cloud_vm"
+)
 
 var (
-	host            *string
-	username        *string
-	password        *string
-	vm_name         *string
-	image_name      *string
-	seed_name       *string
-	image_file      *string
-	seed_file       *string
-	vlan            *string
-	container       *string
-	debug           *bool
-	help            *bool
-	version         *bool
+	host      *string
+	username  *string
+	password  *string
+	vmName    *string
+	imageName *string
+	seedName  *string
+	imageFile *string
+	seedFile  *string
+	vlan      *string
+	container *string
+	debug     *bool
+	help      *bool
+	version   *bool
 )
 
 func init() {
 	host = flag.String("host", "", "a string")
 	username = flag.String("username", "", "a string")
 	password = flag.String("password", "", "a string")
-	vm_name = flag.String("vm-name", "", "a string")
-	image_name = flag.String("image-name", "", "a string")
-	seed_name = flag.String("seed-name", "", "a string")
-	image_file = flag.String("image-file", "", "a string")
-	seed_file = flag.String("seed-file", "", "a string")
+	vmName = flag.String("vm-name", "", "a string")
+	imageName = flag.String("image-name", "", "a string")
+	seedName = flag.String("seed-name", "", "a string")
+	imageFile = flag.String("image-file", "", "a string")
+	seedFile = flag.String("seed-file", "", "a string")
 	vlan = flag.String("vlan", "", "a string")
-	container = flag.String("container", "", "a string")	
+	container = flag.String("container", "", "a string")
 	debug = flag.Bool("debug", false, "a bool")
 	help = flag.Bool("help", false, "a bool")
 	version = flag.Bool("version", false, "a bool")
@@ -96,18 +99,17 @@ func printHelp() {
 	fmt.Println("")
 }
 
+func evaluateFlags() (ntnxAPI.NTNXConnection, ntnxAPI.VMJSONAHV) {
 
-func evaluateFlags() (ntnxAPI.NTNXConnection,ntnxAPI.VM_json_AHV) {
-	
 	//help
 	if *help {
 		printHelp()
 		os.Exit(0)
 	}
-	
-    //version
+
+	//version
 	if *version {
-		fmt.Println("Version: " + AppVersion)
+		fmt.Println("Version: " + appVersion)
 		os.Exit(0)
 	}
 
@@ -117,88 +119,87 @@ func evaluateFlags() (ntnxAPI.NTNXConnection,ntnxAPI.VM_json_AHV) {
 	} else {
 		log.SetLevel(log.InfoLevel)
 	}
-				
+
 	//host
-	if ( *host == "" ) {
-		log.Warn("mandatory option 'host' is not set")	
+	if *host == "" {
+		log.Warn("mandatory option 'host' is not set")
 		os.Exit(0)
 	}
-	
+
 	//username
-	if ( *username == "" ) {
-		log.Warn("mandatory option 'username' is not set")	
+	if *username == "" {
+		log.Warn("mandatory option 'username' is not set")
 		os.Exit(0)
 	}
-	
+
 	//password
-	if ( *password == "" ) {
-		log.Warn("mandatory option 'password' is not set")	
+	if *password == "" {
+		log.Warn("mandatory option 'password' is not set")
 		os.Exit(0)
 	}
-	
-	//vm-name	
-	if ( *vm_name == "" ) {
-		log.Warn("mandatory option 'vm-name' is not set")	
+
+	//vm-name
+	if *vmName == "" {
+		log.Warn("mandatory option 'vm-name' is not set")
 		os.Exit(0)
 	}
-	var v 		 		ntnxAPI.VM_json_AHV	
-	v.Config.Name = *vm_name
-	
-	var n 		 		ntnxAPI.NTNXConnection
-	
+	var v ntnxAPI.VMJSONAHV
+	v.Config.Name = *vmName
+
+	var n ntnxAPI.NTNXConnection
+
 	n.NutanixHost = *host
 	n.Username = *username
 	n.Password = *password
-	
+
 	ntnxAPI.EncodeCredentials(&n)
-	ntnxAPI.CreateHttpClient(&n)
+	ntnxAPI.CreateHTTPClient(&n)
 
 	ntnxAPI.NutanixCheckCredentials(&n)
-	
+
 	//image-name
-	if ( *image_name == "" ) {
-		log.Warn("mandatory option 'image-name' is not set")	
+	if *imageName == "" {
+		log.Warn("mandatory option 'image-name' is not set")
 		os.Exit(0)
 	}
-	
+
 	//image-file
-	if ( *image_file == "" ) {
-		log.Warn("mandatory option 'image-file' is not set")	
+	if *imageFile == "" {
+		log.Warn("mandatory option 'image-file' is not set")
 		os.Exit(0)
 	}
-	
+
 	//seed-name
-	if ( *seed_name == "" ) {
-		log.Warn("mandatory option 'seed-name' is not set")	
+	if *seedName == "" {
+		log.Warn("mandatory option 'seed-name' is not set")
 		os.Exit(0)
 	}
-	
+
 	//seed-file
-	if ( *seed_file == "" ) {
-		log.Warn("mandatory option 'seed-file' is not set")	
+	if *seedFile == "" {
+		log.Warn("mandatory option 'seed-file' is not set")
 		os.Exit(0)
-	}		
-								
+	}
+
 	// If container is not found exit
-	if ( *container != "") {
-		_ , err := ntnxAPI.GetContainerUUIDbyName(&n,*container)
-		if ( err != nil) {
+	if *container != "" {
+		_, err := ntnxAPI.GetContainerUUIDbyName(&n, *container)
+		if err != nil {
 			os.Exit(1)
 		}
-		
+
 	} else {
-		log.Warn("mandatory option 'container' is not set")	
-		os.Exit(0)			
-	} 
-	
-	return n,v
+		log.Warn("mandatory option 'container' is not set")
+		os.Exit(0)
+	}
+
+	return n, v
 }
 
 func main() {
 
 	flag.Usage = printHelp
 	flag.Parse()
-		
 
 	customFormatter := new(log.TextFormatter)
 	customFormatter.TimestampFormat = "2006-01-02 15:04:05"
@@ -206,26 +207,24 @@ func main() {
 	customFormatter.FullTimestamp = true
 
 	var n ntnxAPI.NTNXConnection
-	var v ntnxAPI.VM_json_AHV
-	var net ntnxAPI.Network_REST
-	var im ntnxAPI.Image_json_AHV
-	var seed ntnxAPI.Image_json_AHV
+	var v ntnxAPI.VMJSONAHV
+	var net ntnxAPI.NetworkREST
+	var im ntnxAPI.ImageJSONAHV
+	var seed ntnxAPI.ImageJSONAHV
 	var taskUUID ntnxAPI.TaskUUID
-	
+
 	n, v = evaluateFlags()
-	
-	im.Name = *image_name
-	im.Annotation = "deployed with deploy_cloud_vm"
+
+	im.Name = *imageName
+	im.Annotation = imageDesc
 	im.ImageType = "DISK_IMAGE"
-	seed.Name = *seed_name
-	seed.Annotation = "deployed with deploy_cloud_vm"
+	seed.Name = *seedName
+	seed.Annotation = imageDesc
 	seed.ImageType = "ISO_IMAGE"
-	v.Config.Description = "deployed with deploy_cloud_vm"
+	v.Config.Description = imageDesc
 	v.Config.MemoryMb = 4096
 	v.Config.NumVcpus = 1
 	v.Config.NumCoresPerVcpu = 1
-	
-	
 
 	/*
 	   Short description what will be done
@@ -240,7 +239,7 @@ func main() {
 	*/
 
 	/*To-DO:
-	
+
 	  1. Inplement progress bar while uploading- (concurreny and get progress from task)
 
 
@@ -249,7 +248,7 @@ func main() {
 	// upload cloud image to image service
 	if ntnxAPI.ImageExistbyName(&n, &im) {
 		log.Warn("Image " + im.Name + " already exists")
-		// get existing image ID		
+		// get existing image ID
 	} else {
 		taskUUID, _ = ntnxAPI.CreateImageObject(&n, &im)
 
@@ -260,12 +259,12 @@ func main() {
 
 		im.UUID = ntnxAPI.GetImageUUIDbyTask(&n, &task)
 
-		_, statusCode := ntnxAPI.PutFileToImage(&n, ntnxAPI.NutanixAHVurl(&n), "images/"+im.UUID+"/upload", *image_file, *container)
+		_, statusCode := ntnxAPI.PutFileToImage(&n, ntnxAPI.NutanixAHVurl(&n), "images/"+im.UUID+"/upload", *imageFile, *container)
 
 		if statusCode != 200 {
 			log.Error("Image upload failed")
 			os.Exit(1)
-		}					
+		}
 	}
 
 	// upload seed.iso to image service
@@ -281,28 +280,28 @@ func main() {
 
 		seed.UUID = ntnxAPI.GetImageUUIDbyTask(&n, &task)
 
-		_, statusCode := ntnxAPI.PutFileToImage(&n, ntnxAPI.NutanixAHVurl(&n), "images/"+seed.UUID+"/upload", *seed_file, *container)
+		_, statusCode := ntnxAPI.PutFileToImage(&n, ntnxAPI.NutanixAHVurl(&n), "images/"+seed.UUID+"/upload", *seedFile, *container)
 
 		if statusCode != 200 {
 			log.Error("Image upload failed")
 			os.Exit(1)
 		}
 	}
-	
+
 	// make sure cloud image is active and get all infos when active
 	log.Info("Wait that the cloud image is activated...")
-	ImageActive, _ := ntnxAPI.WaitUntilImageIsActive(&n,&im)
-	if ( !ImageActive ) {
+	ImageActive, _ := ntnxAPI.WaitUntilImageIsActive(&n, &im)
+	if !ImageActive {
 		log.Fatal("Cloud Image is not active")
 		os.Exit(1)
 	}
-	im , _ = ntnxAPI.GetImagebyName(&n, im.Name)
-	
-	// make sure seed image is active and get all infos when active	
+	im, _ = ntnxAPI.GetImagebyName(&n, im.Name)
+
+	// make sure seed image is active and get all infos when active
 	log.Info("Wait that the seed image is activated...")
-	ImageActive, _ = ntnxAPI.WaitUntilImageIsActive(&n,&seed)
-	
-	if ( !ImageActive ) {
+	ImageActive, _ = ntnxAPI.WaitUntilImageIsActive(&n, &seed)
+
+	if !ImageActive {
 		log.Fatal("Seed Image is not active")
 		os.Exit(1)
 	}
@@ -311,12 +310,12 @@ func main() {
 	//check if VM exists
 	exist, _ := ntnxAPI.VMExist(&n, v.Config.Name)
 
-	if ( exist ) {
+	if exist {
 		log.Warn("VM " + v.Config.Name + " already exists")
 	} else {
 
 		// Create VM
-		taskUUID, _ = ntnxAPI.CreateVM_AHV(&n, &v)
+		taskUUID, _ = ntnxAPI.CreateVMAHV(&n, &v)
 
 		task, err := ntnxAPI.WaitUntilTaskFinished(&n, taskUUID.TaskUUID)
 		if err != nil {
@@ -369,8 +368,8 @@ func main() {
 		} else {
 			log.Info("VM started")
 		}
-		
-	  log.Info("Remember that it takes a while untill all tools are installed. Check /var/log/cloud-init-output.log	for messages: 'The VM is finally up, after .. seconds'")
+
+		log.Info("Remember that it takes a while untill all tools are installed. Check /var/log/cloud-init-output.log	for messages: 'The VM is finally up, after .. seconds'")
 
 	}
 }
