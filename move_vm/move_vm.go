@@ -236,10 +236,10 @@ func evaluateFlags() (ntnxAPI.NTNXConnection, ntnxAPI.VMJSONAHV, ntnxAPI.VMJSONA
 	var vm ntnxAPI.VMJSONAHV
 	vm.Config.Name = *vmName
 
-	// new-vm-name
 	if *newVMName == "" {
-		newVMName = vmName
+		*newVMName = *vmName
 	}
+
 	var vNew ntnxAPI.VMJSONAHV
 	vNew.Config.Name = *newVMName
 
@@ -307,7 +307,6 @@ func evaluateFlags() (ntnxAPI.NTNXConnection, ntnxAPI.VMJSONAHV, ntnxAPI.VMJSONA
 		if err != nil {
 			os.Exit(1)
 		}
-
 	}
 
 	return n, vm, vNew, VdiskMapping
@@ -363,13 +362,14 @@ func main() {
 		existVNew, _ = ntnxAPI.VMExist(&n, vNew.Config.Name)
 
 		if existVNew {
-			log.Warn("VM " + vNew.Config.Name + " already exists")
-			if !*overwrite {
-				os.Exit(0)
-			} else {
-				vNew, _ = ntnxAPI.GetVMbyName(&n, &vNew)
+			if vNew.Config.Name != v.Config.Name {
+				log.Warn("VM " + vNew.Config.Name + " already exists")
+				if !*overwrite {
+					os.Exit(0)
+				} else {
+					vNew, _ = ntnxAPI.GetVMbyName(&n, &vNew)
+				}
 			}
-
 		}
 
 		v, _ = ntnxAPI.GetVMbyName(&n, &v)
@@ -393,6 +393,7 @@ func main() {
 		for i, elem := range v.Config.VMDisks {
 			if !elem.IsEmpty {
 				var containerName string
+				var containerUUID string
 				d.VdiskUUID = elem.VMDiskUUID
 				d.ContainerID = elem.ContainerUUID
 				im.Name = v.Config.Name + "-" + elem.Addr.DeviceBus + "." + strconv.Itoa(elem.Addr.DeviceIndex)
@@ -405,35 +406,43 @@ func main() {
 					containerName, _ = ntnxAPI.GetContainerNamebyUUID(&n, VdiskMapping[i].ContainerUUID)
 				}
 
+				var uploadNeeded = true
 				// make sure Images don't exist and overwrite if flag is enabled else WARN and continue
 				// let all Upload take place in parallel and save taskUUID in a Array
 				if ntnxAPI.ImageExistbyName(&n, &im) {
 					if *overwrite {
 						task, _ := ntnxAPI.DeleteImagebyName(&n, im.Name)
 						ntnxAPI.WrappWaitUntilTaskFinished(&n, task.TaskUUID, "Previos existing Image "+im.Name+" deleted")
-
-						taskUUID, _ = ntnxAPI.CreateImageFromURL(&n, &d, &im, containerName)
-						taskUUIDS = append(taskUUIDS, taskUUID)
-						log.Info("Start cloning " + im.Name + " to image service")
 						// if overwrite is disabled
 					} else {
 						log.Info("Image " + im.Name + " already exists - will use existing one instead")
+						uploadNeeded = false
 					}
-				} else {
+				}
+
+				if uploadNeeded {
 
 					// let all Upload take place in parallel and save taskUUID in a Array
 					// if container stays the same clone local
-					if VdiskMapping[i].ContainerUUID == elem.ContainerUUID {
+					if *vdiskMapping != "" {
+						containerUUID = VdiskMapping[i].ContainerUUID
+					} else {
+						containerUUID, _ = ntnxAPI.GetContainerIDbyName(&n, containerName)
+					}
+					if containerUUID == elem.ContainerUUID {
 						taskUUID, _ = ntnxAPI.CreateImageFromVdisk(&n, &d, &im)
 						log.Info("Start cloning " + im.Name + " to image service")
 					} else {
 						taskUUID, _ = ntnxAPI.CreateImageFromURL(&n, &d, &im, containerName)
 						log.Info("Start cloning " + im.Name + " to image service from URL")
 					}
-					taskUUIDS = append(taskUUIDS, taskUUID)
 
 				}
+
+				taskUUIDS = append(taskUUIDS, taskUUID)
+
 			}
+
 		}
 
 		//Wait that all disks have been clone to new container- may take a while
