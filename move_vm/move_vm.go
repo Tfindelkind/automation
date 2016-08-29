@@ -24,7 +24,7 @@ package main
 
 import (
 	log "github.com/Sirupsen/logrus"
-	ntnxAPI "github.com/Tfindelkind/ntnx-golang-client-sdk"
+	ntnxAPI "github.com/Tfindelkind/acropolis-sdk-go"
 
 	"bufio"
 	"flag"
