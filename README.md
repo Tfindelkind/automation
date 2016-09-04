@@ -22,7 +22,7 @@ Don't miss the three dots "..." at the end!
 All binaries should be available at GOPATH\bin
 Check the subfolder README.md for more details like:
 
-https://github.com/Tfindelkind/automation/move_vm
+https://github.com/Tfindelkind/automation/tree/master/move_vm
 
 
 
