@@ -35,8 +35,16 @@ esac
 
 ## redhat style
  if [ $os == "redhat" ]; then
-   # remove the instance
+  # remove the instance
   sudo rm -rf /var/lib/cloud/instances
-   # run the cloud-init again
+  # run the cloud-init again
+  sudo systemctl restart cloud-init.service
+ fi
+
+ ## debian style
+ if [ $os == "debian" ]; then
+	# remove the instance
+  sudo rm -rf /var/lib/cloud/instances
+ 	# run the cloud-init again
   sudo systemctl restart cloud-init.service
  fi

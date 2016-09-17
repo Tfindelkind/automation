@@ -26,14 +26,14 @@ import (
 	log "github.com/Sirupsen/logrus"
 	ntnxAPI "github.com/Tfindelkind/acropolis-sdk-go"
 
+	"flag"
 	"fmt"
 	"os"
-	//"time"
-	"flag"
+	"strconv"
 )
 
 const (
-	appVersion = "0.9 beta"
+	appVersion = "1.0-stable"
 	imageDesc  = "deployed with deploy_cloud_vm"
 )
 
@@ -48,6 +48,9 @@ var (
 	seedFile  *string
 	vlan      *string
 	container *string
+	memoryMb  *string
+	numVcpus  *string
+	diskGB    *string
 	debug     *bool
 	help      *bool
 	version   *bool
@@ -64,6 +67,9 @@ func init() {
 	seedFile = flag.String("seed-file", "", "a string")
 	vlan = flag.String("vlan", "", "a string")
 	container = flag.String("container", "", "a string")
+	memoryMb = flag.String("memoryMb", "2048", "a string")
+	numVcpus = flag.String("numVcpus", "1", "a string")
+	diskGB = flag.String("diskGB", "10000", "a string")
 	debug = flag.Bool("debug", false, "a bool")
 	help = flag.Bool("help", false, "a bool")
 	version = flag.Bool("version", false, "a bool")
@@ -89,6 +95,9 @@ func printHelp() {
 	fmt.Println("--seed-file        Speficy the file name of the seed.iso")
 	fmt.Println("--vlan             Specify the VLAN to which the VM will be connected")
 	fmt.Println("--container        Specify the container where images/vm will be stored")
+	fmt.Println("--memoryMb        	Optional specify the memory of the VM default 2048")
+	fmt.Println("--numVcpus         Optional specify the vCPU of the VM default 1")
+	fmt.Println("--diskGB           Optional specify the diskSize of the VM default 10GB")
 	fmt.Println("--debug            Enables debug mode")
 	fmt.Println("--help             List this help")
 	fmt.Println("--version          Shows the deploy_cloud_vm version")
@@ -228,8 +237,8 @@ func main() {
 	seed.Annotation = imageDesc
 	seed.ImageType = "ISO_IMAGE"
 	v.Config.Description = imageDesc
-	v.Config.MemoryMb = 2048
-	v.Config.NumVcpus = 1
+	v.Config.MemoryMb, _ = strconv.Atoi(*memoryMb)
+	v.Config.NumVcpus, _ = strconv.Atoi(*numVcpus)
 	v.Config.NumCoresPerVcpu = 1
 
 	/*
@@ -333,7 +342,7 @@ func main() {
 		// Clone Cloud-Image disk
 		v.UUID = ntnxAPI.GetVMIDbyTask(&n, &task)
 
-		taskUUID, _ = ntnxAPI.CloneDiskforVM(&n, &v, &im)
+		taskUUID, _ = ntnxAPI.CloneDiskforVMwithMinimumSizeMb(&n, &v, &im, *diskGB)
 
 		task, err = ntnxAPI.WaitUntilTaskFinished(&n, taskUUID.TaskUUID)
 		if err != nil {
