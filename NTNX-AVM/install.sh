@@ -22,29 +22,11 @@
 # ---------------------------------------------------------------------------- #
 
 ## MAIN block-------------------------------------------------------------
+# Installs all scripts and tools in /home/nutanix/work/bin
 
-# retrieve os
-case $OSTYPE in
-	darwin* )
-		os="mac" ;;
-	linux* )
-		if [ -f "/etc/redhat-release" ]; then os="redhat"; fi
-		if [ -f "/etc/debian_version" ]; then os="debian"; fi
-		;;
-esac
+# build and install go tools/scripts
+go build   ./...
+go install ./...
 
-## redhat style
- if [ $os == "redhat" ]; then
-  # remove the instance
-  sudo rm -rf /var/lib/cloud/instances
-  # run the cloud-init again
-  sudo systemctl restart cloud-init.service
- fi
-
- ## debian style
- if [ $os == "debian" ]; then
-	# remove the instance
-  sudo rm -rf /var/lib/cloud/instances
- 	# run the cloud-init again
-  sudo systemctl restart cloud-init.service
- fi
+#
+find . -name '*.sh' -exec cp {} /home/nutanix/work/bin  \;

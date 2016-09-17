@@ -173,17 +173,13 @@ func evaluateFlags() {
 //SendGmail ...
 func SendGmail(smtpConfig SMTPConfig) {
 
-	/*msg := "From: " + smtpConfig.User + "\n" +
-	"To: " + smtpConfig.Recipient + "\n" +
-	"Subject: " + smtpConfig.Subject + "\n\n" +
-	smtpConfig.Message */
 	m := email.NewMessage(smtpConfig.Subject, smtpConfig.Message)
 	m.From = mail.Address{Name: "From", Address: smtpConfig.User}
 	m.To = []string{smtpConfig.Recipient}
 
 	// add attachments
 	if smtpConfig.File != "" {
-		if err := m.Attach("sendEmail.go"); err != nil {
+		if err := m.Attach(smtpConfig.File); err != nil {
 			log.Fatal(err)
 		}
 	}
@@ -202,14 +198,19 @@ func SendGmail(smtpConfig SMTPConfig) {
 //SendOther ...
 func SendOther(smtpConfig SMTPConfig) {
 
-	msg := "From: " + smtpConfig.User + "\n" +
-		"To: " + smtpConfig.Recipient + "\n" +
-		"Subject: " + smtpConfig.Subject + "\n\n" +
-		smtpConfig.Message
+	m := email.NewMessage(smtpConfig.Subject, smtpConfig.Message)
+	m.From = mail.Address{Name: "From", Address: smtpConfig.User}
+	m.To = []string{smtpConfig.Recipient}
 
-	err := smtp.SendMail(smtpConfig.Server+":"+smtpConfig.Port,
-		smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, smtpConfig.Server),
-		smtpConfig.User, []string{smtpConfig.Recipient}, []byte(msg))
+	// add attachments
+	if smtpConfig.File != "" {
+		if err := m.Attach(smtpConfig.File); err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	auth := smtp.PlainAuth("", smtpConfig.User, smtpConfig.Password, smtpConfig.Server)
+	err := smtp.SendMail(smtpConfig.Server+":"+smtpConfig.Port, auth, m.From.Address, m.Tolist(), m.Bytes())
 
 	if err != nil {
 		log.Fatalf("smtp error: %s", err)

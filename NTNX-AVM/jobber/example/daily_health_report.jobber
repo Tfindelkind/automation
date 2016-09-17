@@ -1,0 +1,7 @@
+---
+- name: daily_health_report
+  cmd: echo hello
+  time: 0 0 4
+  onError: Stop
+  notifyOnError: true
+  notifyOnFailure: false
