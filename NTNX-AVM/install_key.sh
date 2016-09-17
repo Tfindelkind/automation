@@ -27,5 +27,6 @@ ncli -s 192.168.178.130 -u admin -p nutanix/4u cluster status | grep Name | cut 
 
 while IFS='' read -r line || [[ -n "$line" ]]; do
      scp /home/nutanix/.ssh/id_rsa.pub nutanix@$line:/home/nutanix/
+     echo $line
      ssh nutanix@$line 'cat id_rsa.pub >> .ssh/authorized_keys2'
 done < cvm_list
