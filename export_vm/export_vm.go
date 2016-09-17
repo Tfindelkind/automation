@@ -222,8 +222,6 @@ func main() {
 		for _, elem := range v.Config.VMDisks {
 			if !elem.IsEmpty {
 
-				fmt.Println(*sshusername + "  " + *sshpassword)
-
 				sshConfig := &ssh.ClientConfig{
 					User: *sshusername,
 					Auth: []ssh.AuthMethod{ssh.Password(*sshpassword)},
