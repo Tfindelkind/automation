@@ -38,7 +38,7 @@ cat << EOF
 
   Options:
     --host        specifies the Nutanix cluster IP or CVM IP
-    --password    (Optional) spefifies the nutanix PASSWORD
+    --password    spefifies the nutanix PASSWORD
     --help        list this help
     --version     shows the version of install_key.sh
 EOF
@@ -85,17 +85,17 @@ if [ $HOST = 0 ]; then
  exit
 fi
 
+if [ $PASSWORD = 0 ]; then
+ echo "--password is mandatory"
+ exit
+fi
+
 ## start logic
 
 ## generate new keypair without pass
 ssh-keygen -b 2048 -t rsa -f /home/nutanix/.ssh/id_rsa -q -N ""
 
-
-if [ $PASSWORD = 0 ]; then
- ncli -s $HOST -u nutanix cluster status | grep Name | cut -d':' -f2 | tr -d ' ' > cvm_list
-else
- ncli -s $HOST -u nutanix -p $PASSWORD cluster status | grep Name | cut -d':' -f2 | tr -d ' ' > cvm_list
-fi
+ncli -s $HOST -u nutanix -p $PASSWORD cluster status | grep Name | cut -d':' -f2 | tr -d ' ' > cvm_list
 
 echo "You need to enter the ssh password for each CVM two times."
 echo ""
