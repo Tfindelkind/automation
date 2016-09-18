@@ -164,11 +164,11 @@ ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; ncc health_checks 
 
 scp nutanix@$HOST:/home/nutanix/data/logs/ncc-output-latest.log /home/nutanix
 
-message=$(cat /home/nutanix/ncc-output-latest.log | grep 'ERR\|FAIL')+$(tail /home/nutanix/ncc-output-latest.log)
+msg=$(cat /home/nutanix/ncc-output-latest.log | grep 'ERR\|FAIL' | tr '\n' ' ')+$(tail /home/nutanix/ncc-output-latest.log | tr '\n' ' ')
+
 
 if [ "$PROVIDER" == "other" ]; then
-  echo $PROVIDER
-  sendEmail --recipient=$RECIPIENT --subject="daily_health_report-$name from NTNX-AVM" --message=$message --provider=$PROVIDER --server=$SERVER --port=$PORT --user=$EMAILUSER --password=$EMAILPASS --file=/home/nutanix/ncc-output-latest.log
+  sendEmail --recipient=$RECIPIENT --subject="ncc_health_report from NTNX-AVM" --message="'$msg'" --provider=$PROVIDER --server=$SERVER --port=$PORT --user=$EMAILUSER --password=$EMAILPASS --file=/home/nutanix/ncc-output-latest.log
 else
-  sendEmail --recipient=$RECIPIENT --subject="daily_health_report-$name from NTNX-AVM" --message=$message --provider=$PROVIDER --user=$EMAILUSER --password=$EMAILPASS --file=/home/nutanix/ncc-output-latest.log
+  sendEmail --recipient=$RECIPIENT --subject="ncc_health_report from NTNX-AVM" --message="'$msg'" --provider=$PROVIDER --user=$EMAILUSER --password=$EMAILPASS --file=/home/nutanix/ncc-output-latest.log
 fi
