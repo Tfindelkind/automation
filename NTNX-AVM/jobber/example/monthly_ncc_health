@@ -1,0 +1,7 @@
+---
+- name: monthly_ncc_health
+  cmd: ncc_health_report.sh 192.168.178.130
+  time: 0 0 4 1
+  onError: Stop
+  notifyOnError: true
+  notifyOnFailure: false
