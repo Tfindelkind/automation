@@ -25,7 +25,6 @@ AppVersion="1.0 stable"
 HELP=0
 VERSION=0
 HOST=0
-PASSWORD=0
 RECIPIENT=0
 PROVIDER=0
 EMAILUSER=0
@@ -43,7 +42,6 @@ cat << EOF
 
   Options:
     --host        specifies ONE Nutanix CVM IP
-    --password    specifies the Nutanix ssh password
     --recipient   specifies the email recipient
     --provider    specifies the email provider
     --emailuser   specifies the email user
@@ -63,10 +61,6 @@ do
 case $i in
     --host=*)
     HOST="${i#*=}"
-    shift # past argument=value
-    ;;
-    --password=*)
-    PASSWORD="${i#*=}"
     shift # past argument=value
     ;;
     --recipient=*)
@@ -120,11 +114,6 @@ if [ $HOST = 0 ]; then
  exit
 fi
 
-if [ $PASSWORD = 0 ]; then
- echo "--password is mandatory"
- exit
-fi
-
 if [ $RECIPIENT = 0 ]; then
  echo "--recipient is mandatory"
  exit
@@ -175,7 +164,7 @@ ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; ncli alerts ls >> 
 ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; __allssh 'ls -lahrt ~/data/logs | grep -i fatal' >> daily_health_report-$name.txt" < /dev/null
 
 scp nutanix@$HOST:daily_health_report-$name.txt /home/nutanix
-ssh nutanix@$HOST "rm daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$HOST "rm daily_health_report-$name.txt" < /dev/nullrm
 
 if [ "$PROVIDER" == "other" ]; then
   echo $PROVIDER
