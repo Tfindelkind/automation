@@ -1,6 +1,6 @@
 ---
 - name: daily_health_report
-  cmd:  daily_health_report.sh --host=192.168.178.132 --password=nutanix/4u --recipient=tfindelkind@fin.local --provider=other --emailuser=tfindelkind@fin.local --emailpass=nutanix/4u --server=192.168.178.20 --port=25
+  cmd:  daily_health_report.sh --host=192.168.178.132 --recipient=tfindelkind@fin.local --provider=other --emailuser=tfindelkind@fin.local --emailpass=nutanix/4u --server=192.168.178.20 --port=25
   time: 0 0 4
   onError: Stop
   notifyOnError: true
