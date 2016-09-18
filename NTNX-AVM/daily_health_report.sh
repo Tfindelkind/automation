@@ -25,9 +25,11 @@ AppVersion="1.0 stable"
 HELP=0
 VERSION=0
 HOST=0
+PASSWORD=0
 RECIPIENT=0
-SMTPUser=0
-SMTPPassword=0
+PROVIDER=0
+EMAILUSER=0
+EMAILPASS=0
 SERVER=0
 PORT=0
 
@@ -41,7 +43,13 @@ cat << EOF
 
   Options:
     --host        specifies the Nutanix cluster IP or CVM IP
-    --password    (Optional) spefifies the nutanix PASSWORD
+    --password    specifies the Nutanix ssh password
+    --recipient   specifies the email recipient
+    --provider    specifies the email provider
+    --emailuser   specifies the email user
+    --emailpass   spefifies the email password
+    --server      only needed when provider=other is used
+    --port        only needed when provider=other is used
     --help        list this help
     --version     shows the version of daily_health_report.sh
 EOF
@@ -59,6 +67,30 @@ case $i in
     ;;
     --password=*)
     PASSWORD="${i#*=}"
+    shift # past argument=value
+    ;;
+    --recipient=*)
+    RECIPIENT="${i#*=}"
+    shift # past argument=value
+    ;;
+    --provider=*)
+    PROVIDER="${i#*=}"
+    shift # past argument=value
+    ;;
+    --emailuser=*)
+    EMAILUSER="${i#*=}"
+    shift # past argument=value
+    ;;
+    --emailpass=*)
+    EMAILPASS="${i#*=}"
+    shift # past argument=value
+    ;;
+    --server=*)
+    SERVER="${i#*=}"
+    shift # past argument=value
+    ;;
+    --port=*)
+    PORT="${i#*=}"
     shift # past argument=value
     ;;
     --help)
@@ -88,13 +120,64 @@ if [ $HOST = 0 ]; then
  exit
 fi
 
+if [ $PASSWORD = 0 ]; then
+ echo "--password is mandatory"
+ exit
+fi
+
+if [ $RECIPIENT = 0 ]; then
+ echo "--recipient is mandatory"
+ exit
+fi
+
+if [ $PROVIDER = 0 ]; then
+ echo "--provider is mandatory"
+ exit
+fi
+
+if [ $EMAILUSER = 0 ]; then
+ echo "--emailuser is mandatory"
+ exit
+fi
+
+if [ $EMAILPASS = 0 ]; then
+ echo "--emailpass is mandatory"
+ exit
+fi
+
+sendEmail --listprovider > provider.tmp
+
+VALIDPROVIDER=0
+
+while IFS='' read -r line || [[ -n "$prov" ]]; do
+  if [ $prov == $PROVIDER ]; then
+    VALIDPROVIDER=1
+  fi
+done < provider.tmp
+rm provider.tmp
+
+if [ $VALIDPROVIDER = 0 ]; then
+ echo "Provider unknown"
+ sendEmail --listprovider
+ exit
+fi
+
+
 ## start logic
 
 name=$(date '+%y-%m-%d')
 
-ssh nutanix@192.168.178.132 "export PS1='fake>' ; source /etc/profile ; nodetool -h 0 ring > daily_health_report-$name.txt" < /dev/null
-ssh nutanix@192.168.178.132 "export PS1='fake>' ; source /etc/profile ; genesis status >> daily_health_report-$name.txt" < /dev/null
-ssh nutanix@192.168.178.132 "export PS1='fake>' ; source /etc/profile ; cluster status >> daily_health_report-$name.txt" < /dev/null
-ssh nutanix@192.168.178.132 "export PS1='fake>' ; source /etc/profile ; df -h >> daily_health_report-$name.txt" < /dev/null
-ssh nutanix@192.168.178.132 "export PS1='fake>' ; source /etc/profile ; ncli alerts ls >> daily_health_report-$name.txt" < /dev/null
-ssh nutanix@192.168.178.132 "export PS1='fake>' ; source /etc/profile ; __allssh 'ls -lahrt ~/data/logs | grep -i fatal' >> daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$host "export PS1='fake>' ; source /etc/profile ; nodetool -h 0 ring > daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$host "export PS1='fake>' ; source /etc/profile ; genesis status >> daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$host "export PS1='fake>' ; source /etc/profile ; cluster status >> daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$host "export PS1='fake>' ; source /etc/profile ; df -h >> daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$host "export PS1='fake>' ; source /etc/profile ; ncli alerts ls >> daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$host "export PS1='fake>' ; source /etc/profile ; __allssh 'ls -lahrt ~/data/logs | grep -i fatal' >> daily_health_report-$name.txt" < /dev/null
+
+scp nutanix@$host:daily_health_report-$name.txt /home/nutanix
+
+if [ $PROVIDER == "other"]; then
+  sendEmail --recipient=$RECIPIENT --subject="daily_health_report-$name from NTNX-AVM" --provider=$PROVIDER --server=$SERVER --port=$PORT --user=$EMAILUSER --password=EMAILPASS
+else
+  sendEmail --recipient=$RECIPIENT --subject="daily_health_report-$name from NTNX-AVM" --provider=$PROVIDER --user=$EMAILUSER --password=$EMAILPASS --file=/home/nutanix/daily_health_report-$name.txt
+fi
