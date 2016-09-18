@@ -38,7 +38,7 @@ cat << EOF
 
   Options:
     --host        specifies the Nutanix cluster IP or CVM IP
-    --password    spefifies the nutanix PASSWORD
+    --password    spefifies the Prism admin PASSWORD
     --help        list this help
     --version     shows the version of install_key.sh
 EOF
@@ -95,7 +95,7 @@ fi
 ## generate new keypair without pass
 ssh-keygen -b 2048 -t rsa -f /home/nutanix/.ssh/id_rsa -q -N ""
 
-ncli -s $HOST -u nutanix -p $PASSWORD cluster status | grep Name | cut -d':' -f2 | tr -d ' ' > cvm_list
+ncli -s $HOST -u admin -p "$PASSWORD" cluster status | grep Name | cut -d':' -f2 | tr -d ' ' > cvm_list
 
 echo "You need to enter the ssh password for each CVM two times."
 echo ""
