@@ -255,6 +255,8 @@ func main() {
 		smtpCon.Password = *password
 		smtpCon.Server = *server
 		smtpCon.Port = *port
+
+		SendOther(smtpCon)
 	}
 
 }

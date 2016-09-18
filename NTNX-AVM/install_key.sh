@@ -20,11 +20,87 @@
 # http://tfindelkind.com
 #
 # ---------------------------------------------------------------------------- #
+LOGDIR=""
+AppVersion="1.0 stable"
+HELP=0
+VERSION=0
+HOST=0
 
+
+
+printHelp()
+{
+cat << EOF
+  USAGE:
+    install_key.sh [options] [value]
+    create keys and deploys them to the Nutanix CVMs via SCP/SSH
+
+  Options:
+    --host        specifies the Nutanix cluster IP or CVM IP
+    --password    (Optional) spefifies the nutanix PASSWORD
+    --help        list this help
+    --version     shows the version of install_key.sh
+EOF
+}
+
+## MAIN block-------------------------------------------------------------
+
+## parse parameter
+for i in "$@"
+do
+case $i in
+    --host=*)
+    HOST="${i#*=}"
+    shift # past argument=value
+    ;;
+    --password=*)
+    PASSWORD="${i#*=}"
+    shift # past argument=value
+    ;;
+    --help)
+    HELP=1
+    shift # past argument=value
+    ;;
+    --version)
+    VERSION=1
+    shift # past argument=value
+    ;;
+esac
+done
+
+## evaluate parameter
+if [ $VERSION = 1 ]; then
+ echo $AppVersion
+ exit
+fi
+
+if [ $HELP = 1 ]; then
+ printHelp
+ exit
+fi
+
+if [ $HOST = 0 ]; then
+ echo "--host is mandatory"
+ exit
+fi
+
+## start logic
+
+## generate new keypair without pass
 ssh-keygen -b 2048 -t rsa -f /home/nutanix/.ssh/id_rsa -q -N ""
 
-ncli -s 192.168.178.130 -u admin -p nutanix/4u cluster status | grep Name | cut -d':' -f2 | tr -d ' ' > cvm_list
 
+if [ $PASSWORD = 0 ]; then
+ ncli -s $HOST -u nutanix cluster status | grep Name | cut -d':' -f2 | tr -d ' ' > cvm_list
+else
+ ncli -s $HOST -u nutanix -p $PASSWORD cluster status | grep Name | cut -d':' -f2 | tr -d ' ' > cvm_list
+fi
+
+echo "You need to enter the ssh password for each CVM two times."
+echo ""
+
+
+## deploy keys to server
 while IFS='' read -r line || [[ -n "$line" ]]; do
        echo "scp public key for $line"
        scp /home/nutanix/.ssh/id_rsa.pub nutanix@$line:/home/nutanix/
