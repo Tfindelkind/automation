@@ -174,7 +174,7 @@ ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; df -h >> daily_hea
 ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; ncli alerts ls >> daily_health_report-$name.txt" < /dev/null
 ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; __allssh 'ls -lahrt ~/data/logs | grep -i fatal' >> daily_health_report-$name.txt" < /dev/null
 
-scp nutanix@$host:daily_health_report-$name.txt /home/nutanix
+scp nutanix@$HOST:daily_health_report-$name.txt /home/nutanix
 
 if [ $PROVIDER == "other"]; then
   sendEmail --recipient=$RECIPIENT --subject="daily_health_report-$name from NTNX-AVM" --provider=$PROVIDER --server=$SERVER --port=$PORT --user=$EMAILUSER --password=EMAILPASS
