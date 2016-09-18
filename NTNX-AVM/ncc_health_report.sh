@@ -120,11 +120,6 @@ if [ $HOST = 0 ]; then
  exit
 fi
 
-if [ $PASSWORD = 0 ]; then
- echo "--password is mandatory"
- exit
-fi
-
 if [ $RECIPIENT = 0 ]; then
  echo "--recipient is mandatory"
  exit
