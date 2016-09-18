@@ -42,7 +42,7 @@ cat << EOF
     create a daily health report and send it via sendEmail
 
   Options:
-    --host        specifies the Nutanix cluster IP or CVM IP
+    --host        specifies ONE Nutanix CVM IP
     --password    specifies the Nutanix ssh password
     --recipient   specifies the email recipient
     --provider    specifies the email provider
@@ -167,12 +167,12 @@ fi
 
 name=$(date '+%y-%m-%d')
 
-ssh nutanix@$host "export PS1='fake>' ; source /etc/profile ; nodetool -h 0 ring > daily_health_report-$name.txt" < /dev/null
-ssh nutanix@$host "export PS1='fake>' ; source /etc/profile ; genesis status >> daily_health_report-$name.txt" < /dev/null
-ssh nutanix@$host "export PS1='fake>' ; source /etc/profile ; cluster status >> daily_health_report-$name.txt" < /dev/null
-ssh nutanix@$host "export PS1='fake>' ; source /etc/profile ; df -h >> daily_health_report-$name.txt" < /dev/null
-ssh nutanix@$host "export PS1='fake>' ; source /etc/profile ; ncli alerts ls >> daily_health_report-$name.txt" < /dev/null
-ssh nutanix@$host "export PS1='fake>' ; source /etc/profile ; __allssh 'ls -lahrt ~/data/logs | grep -i fatal' >> daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; nodetool -h 0 ring > daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; genesis status >> daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; cluster status >> daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; df -h >> daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; ncli alerts ls >> daily_health_report-$name.txt" < /dev/null
+ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; __allssh 'ls -lahrt ~/data/logs | grep -i fatal' >> daily_health_report-$name.txt" < /dev/null
 
 scp nutanix@$host:daily_health_report-$name.txt /home/nutanix
 
