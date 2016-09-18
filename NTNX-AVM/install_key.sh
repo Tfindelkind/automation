@@ -105,5 +105,5 @@ while IFS='' read -r line || [[ -n "$line" ]]; do
        echo "scp public key for $line"
        scp /home/nutanix/.ssh/id_rsa.pub nutanix@$line:/home/nutanix/
        echo "add public key for $line"
-       ssh nutanix@$line 'cat id_rsa.pub >> .ssh/authorized_keys2' < /dev/null
+       ssh nutanix@$line 'cat id_rsa.pub >> .ssh/authorized_keys2; rm id_rsa.pub' < /dev/null
 done < cvm_list

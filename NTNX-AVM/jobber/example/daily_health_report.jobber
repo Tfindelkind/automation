@@ -1,6 +1,6 @@
 ---
 - name: daily_health_report
-  cmd: daily_health_report.sh 192.168.178.130
+  cmd: daily_health_report.sh 192.168.178.132
   time: 0 0 4
   onError: Stop
   notifyOnError: true

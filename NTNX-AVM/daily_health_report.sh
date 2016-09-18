@@ -175,6 +175,7 @@ ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; ncli alerts ls >> 
 ssh nutanix@$HOST "export PS1='fake>' ; source /etc/profile ; __allssh 'ls -lahrt ~/data/logs | grep -i fatal' >> daily_health_report-$name.txt" < /dev/null
 
 scp nutanix@$HOST:daily_health_report-$name.txt /home/nutanix
+ssh nutanix@$HOST "rm daily_health_report-$name.txt" < /dev/null
 
 if [ "$PROVIDER" == "other" ]; then
   echo $PROVIDER
