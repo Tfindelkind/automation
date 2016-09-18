@@ -24,6 +24,7 @@ LOGDIR=""
 AppVersion="1.0 stable"
 HELP=0
 VERSION=0
+PASSWORD=0
 HOST=0
 
 
