@@ -149,7 +149,7 @@ sendEmail --listprovider > provider.tmp
 
 VALIDPROVIDER=0
 
-while IFS='' read -r line || [[ -n "$prov" ]]; do
+while IFS='' read -r prov || [[ -n "$prov" ]]; do
   if [ "$prov" == "$PROVIDER" ]; then
     VALIDPROVIDER=1
   fi
