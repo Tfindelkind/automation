@@ -102,4 +102,4 @@ if [ $? -ne 0 ]; then
 fi
 
 sudo rm -Rr /usr/local/ncli
-sudo unzip ncli.zip -d /usr/local/ncli
+sudo unzip ncli.zip -d /usr/local/ncli > /dev/null

@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"strconv"
 
 	log "github.com/Sirupsen/logrus"
 	ntnxAPI "github.com/Tfindelkind/acropolis-sdk-go"
@@ -88,9 +89,6 @@ func printHelp() {
 	fmt.Println("--vm-name          Specify Virtual Machine name which will exported")
 	fmt.Println("--container        Specify the container where vm will be exported to")
 	fmt.Println("--diskformat       Specify the diskformat vmdk or qcow2")
-	fmt.Println("--esxhost          Specify ESXi host")
-	fmt.Println("--esxusername      Specify username for connect to ESXi")
-	fmt.Println("--esxpassword      Specify password for user on ESXi")
 	fmt.Println("--debug            Enables debug mode")
 	fmt.Println("--overwrite		    Overwrites target VM/Images (delete and creates new one)")
 	fmt.Println("--help             List this help")
@@ -131,14 +129,26 @@ func evaluateFlags() (ntnxAPI.NTNXConnection, ntnxAPI.VMJSONAHV) {
 
 	//username
 	if *username == "" {
-		log.Warn("mandatory option '--username=' is not set")
-		os.Exit(0)
+		log.Warn("option '--username=' is not set  Default: admin is used")
+		*username = "admin"
 	}
 
 	//password
 	if *password == "" {
-		log.Warn("mandatory option '--password=' is not set")
-		os.Exit(0)
+		log.Warn("option '--password=' is not set  Default: nutanix/4u is used")
+		*password = "nutanix/4u"
+	}
+
+	//sshusername
+	if *sshusername == "" {
+		log.Warn("option '--sshusername=' is not set  Default: nutanix is used")
+		*sshusername = "nutanix"
+	}
+
+	//sshpassword
+	if *sshpassword == "" {
+		log.Warn("option '--sshusername=' is not set  Default: nutanix/4u is used")
+		*sshpassword = "nutanix/4u"
 	}
 
 	//vm-name
@@ -146,6 +156,23 @@ func evaluateFlags() (ntnxAPI.NTNXConnection, ntnxAPI.VMJSONAHV) {
 		log.Warn("mandatory option '--vm-name=' is not set")
 		os.Exit(0)
 	}
+
+	//diskformat
+	if *diskformat == "" {
+		log.Warn("option '--diskformat=' is not set  Default: vmdk is used")
+		*diskformat = "vmdk"
+	} else {
+		if *diskformat != "qcow2" && *diskformat != "vmdk" {
+			log.Fatal("diskformat: " + *diskformat + " is unknown.")
+		}
+	}
+
+	//container
+	if *container == "" {
+		log.Warn("mandatory option '--container=' is not set")
+		os.Exit(0)
+	}
+
 	var vm ntnxAPI.VMJSONAHV
 	vm.Config.Name = *vmName
 
@@ -170,6 +197,48 @@ func evaluateFlags() (ntnxAPI.NTNXConnection, ntnxAPI.VMJSONAHV) {
 
 	return n, vm
 
+}
+
+func sshExec(host string, user string, password string, exec string) {
+	sshConfig := &ssh.ClientConfig{
+		User: user,
+		Auth: []ssh.AuthMethod{ssh.Password(password)},
+	}
+
+	connection, err := ssh.Dial("tcp", host+":22", sshConfig)
+	if err != nil {
+		log.Warn("Failed to dial: %s")
+		os.Exit(1)
+	}
+
+	session, err := connection.NewSession()
+	if err != nil {
+		log.Warn("Failed to create session: %s")
+		os.Exit(1)
+	}
+
+	stdin, err := session.StdinPipe()
+	if err != nil {
+		log.Warn("Unable to setup stdin for session: %v")
+		os.Exit(1)
+	}
+	go io.Copy(stdin, os.Stdin)
+
+	stdout, err := session.StdoutPipe()
+	if err != nil {
+		log.Warn("Unable to setup stdout for session: %v")
+		os.Exit(1)
+	}
+	go io.Copy(os.Stdout, stdout)
+
+	stderr, err := session.StderrPipe()
+	if err != nil {
+		log.Warn("Unable to setup stderr for session: %v")
+		os.Exit(1)
+	}
+	go io.Copy(os.Stderr, stderr)
+
+	session.Run(exec)
 }
 
 func main() {
@@ -218,56 +287,21 @@ func main() {
 			os.Exit(0)
 		}
 
+		var i int
+
 		// export each vDisk to NFS store
 		for _, elem := range v.Config.VMDisks {
-			if !elem.IsEmpty {
-
-				sshConfig := &ssh.ClientConfig{
-					User: *sshusername,
-					Auth: []ssh.AuthMethod{ssh.Password(*sshpassword)},
-				}
-
-				connection, err := ssh.Dial("tcp", *host+":22", sshConfig)
-				if err != nil {
-					log.Warn("Failed to dial: %s")
-					os.Exit(1)
-				}
-
-				session, err := connection.NewSession()
-				if err != nil {
-					log.Warn("Failed to create session: %s")
-					os.Exit(1)
-				}
-
-				stdin, err := session.StdinPipe()
-				if err != nil {
-					log.Warn("Unable to setup stdin for session: %v")
-					os.Exit(1)
-				}
-				go io.Copy(stdin, os.Stdin)
-
-				stdout, err := session.StdoutPipe()
-				if err != nil {
-					log.Warn("Unable to setup stdout for session: %v")
-					os.Exit(1)
-				}
-				go io.Copy(os.Stdout, stdout)
-
-				stderr, err := session.StderrPipe()
-				if err != nil {
-					log.Warn("Unable to setup stderr for session: %v")
-					os.Exit(1)
-				}
-				go io.Copy(os.Stderr, stderr)
+			if !elem.IsCdrom {
 
 				TargetContainerName := *container
 
 				SourceContainerName, _ := ntnxAPI.GetContainerNamebyUUID(&n, elem.ContainerUUID)
 
-				execString := "/usr/local/nutanix/bin/qemu-img convert nfs://127.0.0.1/" + SourceContainerName + "/.acropolis/vmdisk/" + elem.VMDiskUUID + " -O vmdk nfs://127.0.0.1/" + TargetContainerName + "/" + elem.VMDiskUUID + ".vmdk"
+				i++
+				execString := "/usr/local/nutanix/bin/qemu-img convert nfs://127.0.0.1/" + SourceContainerName + "/.acropolis/vmdisk/" + elem.VMDiskUUID + " -O " + *diskformat + " nfs://127.0.0.1/" + TargetContainerName + "/" + v.Config.Name + "-" + strconv.Itoa(i) + "." + *diskformat
 
-				fmt.Println(execString)
-				session.Run(execString)
+				log.Info("Converting disk: " + strconv.Itoa(i) + " from VM: " + v.Config.Name + " to disk /" + TargetContainerName + "/" + v.Config.Name + "-" + strconv.Itoa(i) + "." + *diskformat)
+				sshExec(*host, *sshusername, *sshpassword, execString)
 
 			}
 		}
