@@ -164,6 +164,7 @@ func mkDIR(path string) {
 	}
 }
 
+//Mount ...
 func mount(hostname string, share string, path string) {
 	cmd := exec.Command("/bin/bash", "-c", "sudo mount -t nfs "+hostname+":/"+share+" "+path)
 	cmd.Stdout = os.Stdout
@@ -174,6 +175,7 @@ func mount(hostname string, share string, path string) {
 	}
 }
 
+//Umount ...
 func umount(path string) {
 	cmd := exec.Command("/bin/bash", "-c", "sudo umount "+path)
 	cmd.Stdout = os.Stdout
