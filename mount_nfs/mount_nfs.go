@@ -155,16 +155,16 @@ func mkDIR(path string) {
 	_, err := exec.Command("/bin/bash", "-c", "sudo mkdir -p "+path).Output()
 	if err != nil {
 		log.Error("Could not create mountpoint: " + path)
-		log.Error(err)
 	}
 }
 
 func mount(hostname string, share string, path string) {
 	cmd := exec.Command("/bin/bash", "-c", "sudo mount -t nfs "+hostname+":/"+share+" "+path)
-	_, err := cmd.Output()
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
 	if err != nil {
 		log.Error("Could not mount share: " + share + " from host: " + hostname + " to path: " + path)
-		log.Error(err)
 	}
 }
 
