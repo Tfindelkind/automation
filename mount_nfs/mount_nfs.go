@@ -152,7 +152,10 @@ func evaluateFlags() ntnxAPI.NTNXConnection {
 
 func mkDIR(path string) {
 
-	_, err := exec.Command("/bin/bash", "-c", "sudo mkdir -p "+path).Output()
+	cmd := exec.Command("/bin/bash", "-c", "sudo mkdir -p "+path)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
 	if err != nil {
 		log.Error("Could not create mountpoint: " + path)
 	}
