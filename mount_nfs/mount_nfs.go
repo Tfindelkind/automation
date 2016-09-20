@@ -152,19 +152,19 @@ func evaluateFlags() ntnxAPI.NTNXConnection {
 
 func mkDIR(path string) {
 
-	output, err := exec.Command("/bin/bash", "-c", "sudo mkdir -p "+path).Output()
+	_, err := exec.Command("/bin/bash", "-c", "sudo mkdir -p "+path).Output()
 	if err != nil {
 		log.Error("Could not create mountpoint: " + path)
-		log.Error(output)
+		log.Error(err)
 	}
 }
 
 func mount(hostname string, share string, path string) {
-	fmt.Println("/bin/bash -c sudo mount -t nfs " + hostname + ":/" + share + " " + path)
-	output, err := exec.Command("/bin/bash", "-c", "sudo mount -t nfs "+hostname+":/"+share+" "+path).Output()
+	cmd := exec.Command("/bin/bash", "-c", "sudo mount -t nfs "+hostname+":/"+share+" "+path)
+	_, err := cmd.Output()
 	if err != nil {
 		log.Error("Could not mount share: " + share + " from host: " + hostname + " to path: " + path)
-		log.Error(output)
+		log.Error(err)
 	}
 }
 
