@@ -27,6 +27,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 	ntnxAPI "github.com/Tfindelkind/acropolis-sdk-go"
@@ -182,10 +183,8 @@ func main() {
 	n = evaluateFlags()
 
 	if *whitelist != "" {
-		err := ntnxAPI.AddWhiteList(&n, *whitelist)
-		if err != nil {
-			os.Exit(1)
-		}
+		ntnxAPI.AddWhiteList(&n, *whitelist)
+		time.Sleep(5000) // Wait so Whitelist will be active
 	}
 
 	if *container != "MOUNT-ALL" {
