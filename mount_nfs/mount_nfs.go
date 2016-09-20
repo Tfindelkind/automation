@@ -42,6 +42,7 @@ var (
 	container  *string
 	mountpoint *string
 	whitelist  *string
+	unmount    *bool
 	debug      *bool
 	help       *bool
 	version    *bool
@@ -54,6 +55,7 @@ func init() {
 	container = flag.String("container", "", "a string")
 	mountpoint = flag.String("mountpoint", "", "a string")
 	whitelist = flag.String("whitelist", "", "a string")
+	unmount = flag.Bool("unmount", false, "a bool")
 	debug = flag.Bool("debug", false, "a bool")
 	help = flag.Bool("help", false, "a bool")
 	version = flag.Bool("version", false, "a bool")
@@ -72,9 +74,10 @@ func printHelp() {
 	fmt.Println("--username         Specify username for connect to host")
 	fmt.Println("--password         Specify password for user")
 	fmt.Println("--container        Specify the container to mount - Default mount all")
-	fmt.Println("--mountpoint       (Optional) the mount point like ´/mount/´ WITH tailing /")
+	fmt.Println("--mountpoint       (Optional) the mount point like '/mount/' WITH tailing /")
 	fmt.Println("--whitelist		    (Optional) nnn.nnn.nnn.nnn/xxx.xxx.xxx.xxx")
 	fmt.Println("           		    where nnn is the IP address, and xxx is the subnet mask.")
+	fmt.Println("--unmount		      will unmount in 'mount all' mode")
 	fmt.Println("--debug            Enables debug mode")
 	fmt.Println("--help             List this help")
 	fmt.Println("--version          Show the deploy_cloud_vm version")
@@ -171,6 +174,16 @@ func mount(hostname string, share string, path string) {
 	}
 }
 
+func umount(path string) {
+	cmd := exec.Command("/bin/bash", "-c", "sudo umount "+path)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	err := cmd.Run()
+	if err != nil {
+		log.Error("Could not unmount path: " + path)
+	}
+}
+
 func main() {
 
 	flag.Usage = printHelp
@@ -191,6 +204,7 @@ func main() {
 	}
 
 	if *container != "MOUNT-ALL" {
+
 		_, err := ntnxAPI.GetContainerIDbyName(&n, *container)
 		if err != nil {
 			os.Exit(1)
@@ -210,9 +224,12 @@ func main() {
 
 	list, _ := ntnxAPI.GetContainerNames(&n)
 	for _, elem := range list {
-
-		mkDIR("/mnt/" + elem)
-		mount(*host, elem, "/mnt/"+elem)
+		if *unmount {
+			umount("/mnt/" + elem)
+		} else {
+			mkDIR("/mnt/" + elem)
+			mount(*host, elem, "/mnt/"+elem)
+		}
 
 	}
 
