@@ -426,7 +426,7 @@ func main() {
 					addDiskVMX(vmfile, i, v.Config.Name+"-"+strconv.Itoa(i)+"."+*diskformat)
 				}
 
-				execString := "/usr/local/nutanix/bin/qemu-img convert nfs://127.0.0.1/" + SourceContainerName + "/.acropolis/vmdisk/" + elem.VMDiskUUID + " -O " + *diskformat + " nfs://127.0.0.1/" + TargetContainerName + "/" + v.Config.Name + "/" + v.Config.Name + "-" + strconv.Itoa(i) + "." + *diskformat
+				execString := "/usr/local/nutanix/bin/qemu-img convert -p nfs://127.0.0.1/" + SourceContainerName + "/.acropolis/vmdisk/" + elem.VMDiskUUID + " -O " + *diskformat + " nfs://127.0.0.1/" + TargetContainerName + "/" + v.Config.Name + "/" + v.Config.Name + "-" + strconv.Itoa(i) + "." + *diskformat
 
 				log.Info("Converting disk: " + strconv.Itoa(i) + " from VM: " + v.Config.Name + " to disk /" + TargetContainerName + "/" + v.Config.Name + "-" + strconv.Itoa(i) + "." + *diskformat)
 				sshExec(*host, *sshusername, *sshpassword, execString)
