@@ -1,0 +1,13 @@
+[Unit]
+Description=SUI container
+Requires=docker.service
+After=docker.service
+
+[Service]
+Restart=always
+ExecStart=/usr/bin/docker run -d --name SUI tfindelkind/SUI
+ExecStop=/usr/bin/docker stop -t 2 SUI
+ExecStopPost=/usr/bin/docker rm -f SUI
+
+[Install]
+WantedBy=default.target
