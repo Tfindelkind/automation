@@ -95,16 +95,4 @@ fi
 ## generate new keypair without pass
 ssh-keygen -b 2048 -t rsa -f /home/nutanix/.ssh/id_rsa -q -N ""
 
-ncli -s $HOST -u admin -p "$PASSWORD" cluster status | grep Name | cut -d':' -f2 | tr -d ' ' > cvm_list
-
-echo "You need to enter the ssh password for each CVM two times."
-echo ""
-
-
-## deploy keys to server
-while IFS='' read -r line || [[ -n "$line" ]]; do
-       echo "scp public key for $line"
-       scp /home/nutanix/.ssh/id_rsa.pub nutanix@$line:/home/nutanix/
-       echo "add public key for $line"
-       ssh nutanix@$line 'cat id_rsa.pub >> .ssh/authorized_keys2; rm id_rsa.pub' < /dev/null
-done < cvm_list
+ncli -s $HOST -u admin -p "$PASSWORD" cluster add-public-key name=NTNX-AVM file-path=/home/nutanix/.ssh/id_rsa.pub
