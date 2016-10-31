@@ -218,14 +218,14 @@ func evaluateFlags() (ntnxAPI.NTNXConnection, ntnxAPI.VMJSONAHV, ntnxAPI.VMJSONA
 
 	//username
 	if *username == "" {
-		log.Warn("mandatory option '--username=' is not set")
-		os.Exit(0)
+		log.Warn("option '--username=' is not set  Default: admin is used")
+		*username = "admin"
 	}
 
 	//password
 	if *password == "" {
-		log.Warn("mandatory option '--password=' is not set")
-		os.Exit(0)
+		log.Warn("option '--password=' is not set  Default: nutanix/4u is used")
+		*password = "nutanix/4u"
 	}
 
 	//vm-name

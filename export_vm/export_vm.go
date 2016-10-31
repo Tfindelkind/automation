@@ -93,7 +93,7 @@ func printHelp() {
 	fmt.Println("--container        Specify the container where vm will be exported to")
 	fmt.Println("--diskformat       Specify the diskformat vmdk or qcow2")
 	fmt.Println("--debug            Enables debug mode")
-	fmt.Println("--vmx		    			.vmx file will be created !!!! NFS whitelist and linux/mac required")
+	fmt.Println("--vmx              .vmx file will be created !!!! NFS whitelist and linux/mac required")
 	fmt.Println("--help             List this help")
 	fmt.Println("--version          Show the deploy_cloud_vm version")
 	fmt.Println("")
@@ -333,8 +333,6 @@ func addDiskVMX(file string, id int, filename string) {
 	check(err)
 	writer := bufio.NewWriter(f)
 	defer f.Close()
-
-	fmt.Println("hello")
 
 	fmt.Fprintln(writer, `scsi0:`+strconv.Itoa(id)+`.present = "TRUE"`)
 	fmt.Fprintln(writer, `scsi0:`+strconv.Itoa(id)+`.filename = "`+filename+`"`)
