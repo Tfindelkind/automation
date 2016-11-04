@@ -66,7 +66,7 @@ func printHelp() {
 	fmt.Println("Usage: mount_nfs [OPTIONS]")
 	fmt.Println("mount_nfs [ --help | --version ]")
 	fmt.Println("")
-	fmt.Println("FOR NUTANIX AHV ONLY- exports an AHV VM")
+	fmt.Println("mounts a Nutanix container in the /mnt directory")
 	fmt.Println("")
 	fmt.Println("Options:")
 	fmt.Println("")
